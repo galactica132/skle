@@ -1,0 +1,1 @@
+<?phpif(isset($_GET['logout'])) {unset($_SESSION['logged']);header("Location: index.php");exit();}?>
