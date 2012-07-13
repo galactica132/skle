@@ -1,11 +1,20 @@
 <?php
 ob_start();
 session_start();
+function mysqlesc() {
+     return "'".mysql_real_escape_string($x)."'";
+}
+
+function htmlsafechars($txt='') {
+  $txt = preg_replace("/&(?!#[0-9]+;)(?:amp;)?/s", '&amp;', $txt );
+  $txt = str_replace( array("<",">",'"',"'"), array("&lt;", "&gt;", "&quot;", '&#039;'), $txt );
+  return $txt;
+}
 
 // Title mysql alapon
 function gettitle() {
-$get = "SELECT pagetitle FROM titles WHERE file='$file'";
-$file = $_POST['file'];
+$get = "SELECT pagetitle FROM titles WHERE file=".mysqlesc($file);
+$file = htmlsafechars($_POST['file']);
 $query = mysql_query($get) or die(mysql_error());
 $title = mysql_fetch_array($query);
 }
@@ -19,8 +28,8 @@ $title03 = ' Elfelejtett jelszó';
 $title04 = ' Profil';
 
 // Server változók
-$current_file = $_SERVER['SCRIPT_NAME'];
-$http_referer = $_SERVER['HTTP_REFERER'];
+$current_file = htmlsafechars($_SERVER['SCRIPT_NAME']);
+$http_referer = htmlsafechars($_SERVER['HTTP_REFERER']);
 
 // Beléptetett user benttartása
 function loggedin() {

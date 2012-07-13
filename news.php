@@ -9,7 +9,7 @@ require 'functions/bbcode.php';
 <html lang="hu">
 <head>
 <link href="css/style.css" rel="stylesheet" type="text/css">
-<title><?php print $title00; if (isset($_GET['news'])) print $title01; ?></title>
+<title><?php print $title00; if (isset(htmlsafechars($_GET['news']))) print $title01; ?></title>
 </head>
 <body>
 <div id="content">
@@ -29,7 +29,7 @@ extract($r);
 if (isset ($_GET['news'])) {
 ?>
 <div id="right_panel">
-<div class="news_right_panel_top"><?php print htmlspecialchars($title) ?><hr> <?php print htmlspecialchars($date)?> - <?php print htmlspecialchars($user) ?> </div>
+<div class="news_right_panel_top"><?php print htmlsafechars($title) ?><hr> <?php print htmlsafechars($date)?> - <?php print htmlsafechars($user) ?> </div>
 <div class="right_panel_content"><?php print bb("$message") ?></div>
 <div class="right_panel_footer"></div>
 </div>

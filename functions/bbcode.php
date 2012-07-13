@@ -1,5 +1,6 @@
 <?php
 function bb($message){
+$message = htmlsafechars($message);
 $from = array(
 "/\n?\[code\](.*?)\[\/code\]/si",
 "/\n?\[php\](.*?)\[\/php\]/sie",

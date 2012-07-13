@@ -10,9 +10,9 @@ require 'core.php';
 <link href="css/style.css" rel="stylesheet" type="text/css">
 <title>
 <?php print $title00;
-if (isset($_GET['user'])) print $title02;
-if (isset($_GET['forgetpass'])) print $title03;
-if (isset($_GET['akarmi'])) print $title_default;
+if (isset(htmlsafechars($_GET['user']))) print $title02;
+if (isset(htmlsafechars($_GET['forgetpass']))) print $title03;
+if (isset(htmlsafechars($_GET['akarmi']))) print $title_default;
 ?>
 </title>
 </head>
@@ -36,24 +36,24 @@ include 'includes/left_panel.php';
 if (isset($_GET['user'])) {
 if (!loggedin()) {
 if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['password_again']) && isset($_POST['email'])) {
-$username = $_POST['username'];
-$password = $_POST['password'];
-$password_again = $_POST['password_again'];
+$username = htmlsafechars($_POST['username']);
+$password = htmlsafechars($_POST['password']);
+$password_again = htmlsafechars($_POST['password_again']);
 $password_hash = md5("De98W6R8D3W97PL".$password."10EGfTNbvNvs5sp");
-$email = $_POST['email'];
+$email = htmlsafechars($_POST['email']);
 
 if (!empty($username) && !empty($password) && !empty($password_again) && !empty($email)) {
 if ($password != $password_again) {
 echo '<hr><div class="error">A jelszavak nem egyeznek.</div>';
 } else {
-$query_reg = "SELECT username FROM users WHERE username='$username'";
+$query_reg = "SELECT username FROM users WHERE username=".mysqlesc($username);
 $query_run_reg = mysql_query($query_reg);
 if (mysql_num_rows($query_run_reg) == 1) {
 echo '<hr><div class="error">A felhasználónév '.$username.' már létezik.</div>';
 } else {
 if (preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/",$email)) {
 // Adatok bevitele
-$query_reg = "INSERT INTO users VALUES ('','".mysql_real_escape_string($username)."','".mysql_real_escape_string($password_hash)."','".mysql_real_escape_string($email)."', 0)";
+$query_reg = "INSERT INTO users VALUES ('',".mysqlesc($username).",".mysqlesc($password_hash).",".mysqlesc($email).", 0)";
 if ($query_run_reg = mysql_query($query_reg)) {
 echo 'Sikeres regisztráció';
 header('Location: register.php?success');
@@ -125,10 +125,10 @@ E-mail:<br><input type="text" name="email"value="<?php echo $email; ?>"><br><br>
 } else if (loggedin()) {
 echo 'Te már regisztráltál, és beléptél.';
 }
-} else if (isset($_GET['success'])) {
+} else if (isset(htmlsafechars($_GET['success']))) {
 print '<div class="success"><strong>Gratulálunk,</strong> sikeresen regisztráltad magad oldalunkra!<br>
 Most már beléphetsz!</div>';
-} else if (isset($_GET['forgetpass'])) {
+} else if (isset(htmlsafechars($_GET['forgetpass']))) {
 ?>
 <form action="register.php?forgetpass" method="POST">
 Amennyiben elfelejtetted a jelenlegi jelszavadat, itt kérhetsz újat. Csak add meg a regisztrációkor használt e-mail címet, és rendszerünk küld egy új jelszót!
@@ -138,12 +138,12 @@ Az eddig használt jelszó el fog veszni.<p>
 </form>
 <?php
 if (isset($forgetpass)) {
-$username = $_POST['username'];
-$read = mysql_query("SELECT * FROM users WHERE username='$username'");
+$username = htmlsafechars($_POST['username']);
+$read = mysql_query("SELECT * FROM users WHERE username=".mysqlesc($username));
 $sor = mysql_num_rows($read);
 $rows = mysql_fetch_array($read);
-$email = $rows["email"];
-$password = $rows["password"];
+$email = htmlsafechars($rows["email"]);
+$password = htmlsafechars($rows["password"]);
 if($sor == 1) {
 mail($email, "Elfelejtett jelszó", $password);
 print 'Jelszavad kiküldtük a címedre';

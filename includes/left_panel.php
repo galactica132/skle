@@ -14,19 +14,19 @@ print 'Bejelentkezés';
 if (loggedin()) {
 echo '<a href="user.php?user_id='.$_SESSION['user_id'].'">Profilom</a><br><a href="logout.php">Kilépés</a>';
 } else {
-if (isset($_POST['login'])) {
-$username = $_POST['username'];
-$password = $_POST['password'];
+if (isset(htmlsafechars($_POST['login']))) {
+$username = htmlsafechars($_POST['username']);
+$password = htmlsafechars($_POST['password']);
 $password_hash = md5("De98W6R8D3W97PL".$password."10EGfTNbvNvs5sp");
 
-$query = "SELECT id FROM users WHERE username='".mysql_real_escape_string($username)."' AND password='".mysql_real_escape_string($password_hash)."'";
+$query = "SELECT id FROM users WHERE username=".mysqlesc($username)." AND password=".mysqlesc($password_hash);
 if ($query_run = mysql_query($query)) {
 $query_num_rows = mysql_num_rows($query_run);
 if ($query_num_rows == 0) {
 echo '<div class="error">Helytelen adatok!</div>';
 } else if ($query_num_rows == 1) {
 $user_id = mysql_result($query_run, 0, 'id');
-$_SESSION['user_id'] = $user_id;
+$_SESSION['user_id'] = (int)$user_id;
 header('Location: index.php');
 }
 }
