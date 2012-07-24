@@ -69,7 +69,7 @@ echo "</body>
 
 function reg_hiba($text) {
 echo "<hr /><div class='error'>".htmlsafechars($text)."</div><br />
-<div align='center'><a href='register_new.php?user'>Vissza</a></div>";
+<div align='center'><a href='register.php?user'>Vissza</a></div>";
 foot();
 exit;
 }
