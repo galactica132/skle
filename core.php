@@ -1,14 +1,10 @@
 <?php
 ob_start();
 session_start();
-error_reporting(E_ALL);
-//added by galactica132
-function mysqlesc($x) {
+function mysqlesc() {
      return "'".mysql_real_escape_string($x)."'";
 }
 
-//added by galactica132
-//Változók ellenõrzése esetleges html karakterekre vagy xss-re
 function htmlsafechars($txt='') {
   $txt = preg_replace("/&(?!#[0-9]+;)(?:amp;)?/s", '&amp;', $txt );
   $txt = str_replace( array("<",">",'"',"'"), array("&lt;", "&gt;", "&quot;", '&#039;'), $txt );
@@ -33,7 +29,7 @@ $title04 = ' Profil';
 
 // Server változók
 $current_file = htmlsafechars($_SERVER['SCRIPT_NAME']);
-$http_referer = htmlsafechars($_SERVER['HTTP_HOST']);
+$http_referer = htmlsafechars($_SERVER['HTTP_REFERER']);
 
 // Beléptetett user benttartása
 function loggedin() {
@@ -44,33 +40,18 @@ return false;
 }
 }
 
-//header és footer egyszerûsítve.... by galactica132
-function head($title) {
-echo '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html lang="hu">
-<head>
-<link href="css/style.css" rel="stylesheet" type="text/css">
-<title>'.$title.'</title>
-</head>
-<body>
-<div id="content">
-<div id="header"></div>
-
-';
+/* function ranks() {
+$query = "SELECT id FROM users WHERE username='".mysql_real_escape_string($username)."' AND password='".mysql_real_escape_string($password_hash)."'";
+if(mysql_num_rows($query)>0) {
+$ranks = mysql_fetch_assoc($query);
+print_r($_ranks);
+if ($ranks['rank'] == 0) {
+// User rész
+} else if($ranks['rank'] == 1) {
+// Csapattag rész
+} else if($ranks['rank'] == 2) {
+// Admin rész
 }
-
-function foot() {
-echo "</body>
-<div class='footer'>
-&nbsp; 2012 || Coded by: gala & Kazushi93
-</div>
-</html>";
 }
-
-function reg_hiba($text) {
-echo "<hr /><div class='error'>".htmlsafechars($text)."</div><br />
-<div align='center'><a href='register_new.php?user'>Vissza</a></div>";
-foot();
-exit;
-}
+} */
 ?>

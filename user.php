@@ -31,7 +31,6 @@ include 'includes/menu.php';
 include 'includes/left_panel.php';
 
 // Hírek
-if (loggedin()) {
 ?>
 <div id="right_panel">
 <div class="news_right_panel_top">Profil</div>
@@ -50,18 +49,6 @@ if (loggedin()) {
 <div class="right_panel_footer"></div>
 </div>
 <?php
-}
-else {
-?>
-<div id="right_panel">
-<div class="news_right_panel_top">Profil</div>
-<div class="right_panel_content">
-A megtekintéshez reg. szükséges...féle béta üzenet. :D
-</div>
-<div class="right_panel_footer"></div>
-</div>
-<?php
-}
 // Footer
 include("includes/footer.php");
 ?>

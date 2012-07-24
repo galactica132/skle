@@ -9,7 +9,7 @@ require 'functions/bbcode.php';
 <html lang="hu">
 <head>
 <link href="css/style.css" rel="stylesheet" type="text/css">
-<title><?php print $title00; if (isset($_GET['news'])) print $title01; ?></title>
+<title><?php print $title00; if (isset(htmlsafechars($_GET['news']))) print $title01; ?></title>
 </head>
 <body>
 <div id="content">

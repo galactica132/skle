@@ -14,7 +14,7 @@ print 'Bejelentkezés';
 if (loggedin()) {
 echo '<a href="user.php?user_id='.$_SESSION['user_id'].'">Profilom</a><br><a href="logout.php">Kilépés</a>';
 } else {
-if (isset($_POST['login'])) {
+if (isset(htmlsafechars($_POST['login']))) {
 $username = htmlsafechars($_POST['username']);
 $password = htmlsafechars($_POST['password']);
 $password_hash = md5("De98W6R8D3W97PL".$password."10EGfTNbvNvs5sp");
