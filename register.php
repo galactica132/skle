@@ -1,40 +1,38 @@
 <?php
-require 'mysql.php';
-require 'core.php';
-?>
+require_once 'mysql.php';
+require_once 'core.php';
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-<html lang="hu">
-<head>
-<link href="css/style.css" rel="stylesheet" type="text/css">
-<title>
-<?php print $title00;
-if (isset(htmlsafechars($_GET['user']))) print $title02;
-if (isset(htmlsafechars($_GET['forgetpass']))) print $title03;
-if (isset(htmlsafechars($_GET['akarmi']))) print $title_default;
-?>
-</title>
-</head>
-<body>
-<div id="content">
-<div id="header"></div>
+$title1 = $title00;
+if (isset($_GET['user'])) $title = $title1.$title02;
+if (isset($_GET['forgetpass'])) $title = $title1.$title03;
+if (isset($_GET['akarmi'])) $title = $title1.$title_default;
 
-<?php
+head($title);
 // Menü
 include 'includes/menu.php';
 
 // Jobb oldali panelek
 include 'includes/left_panel.php';
-
 // Tartalom
-?>
+if (!isset($_GET['user']))
+{ 
+echo "Nem létezõ URL lekérés.";
+foot();
+exit;
+}
+if (isset($_GET['user']))
+echo '
 <div id="right_panel">
 <div class="news_right_panel_top">Regisztráció</div>
 <div class="right_panel_content">
-<?php
-if (isset($_GET['user'])) {
-if (!loggedin()) {
+';
+if (loggedin())
+reg_hiba("Te már regisztráltál, és beléptél.");
+if (isset($_GET['success']))
+print '<div class="success"><strong>Gratulálunk,</strong> sikeresen regisztráltad magad oldalunkra!<br>
+Most már beléphetsz!</div>';
+
+if ( ($_SERVER['REQUEST_METHOD'] === 'POST') AND (isset($_GET['user'])) ) {
 if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['password_again']) && isset($_POST['email'])) {
 $username = htmlsafechars($_POST['username']);
 $password = htmlsafechars($_POST['password']);
@@ -42,35 +40,28 @@ $password_again = htmlsafechars($_POST['password_again']);
 $password_hash = md5("De98W6R8D3W97PL".$password."10EGfTNbvNvs5sp");
 $email = htmlsafechars($_POST['email']);
 
-if (!empty($username) && !empty($password) && !empty($password_again) && !empty($email)) {
-if ($password != $password_again) {
-echo '<hr><div class="error">A jelszavak nem egyeznek.</div>';
-} else {
+if ( (empty($username)) or (empty($password)) or (empty($password_again)) or (empty($email)) )
+reg_hiba("Minden mezõ kitöltése kötelezõ!");
+
+if ($password != $password_again)
+reg_hiba("A jelszavak nem egyeznek.");
 $query_reg = "SELECT username FROM users WHERE username=".mysqlesc($username);
-$query_run_reg = mysql_query($query_reg);
-if (mysql_num_rows($query_run_reg) == 1) {
-echo '<hr><div class="error">A felhasználónév '.$username.' már létezik.</div>';
-} else {
-if (preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/",$email)) {
+$query_run_reg = mysql_query($query_reg) or die(mysql_error(__FILE__,__LINE__));
+if (mysql_num_rows($query_run_reg) == 1)
+reg_hiba("A felhasználónév ".$username." már létezik.</div>");
 // Adatok bevitele
-$query_reg = "INSERT INTO users VALUES ('',".mysqlesc($username).",".mysqlesc($password_hash).",".mysqlesc($email).", 0)";
+if (!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/",$email))
+reg_hiba("Hibás e-mail cím!");
+
+$query_reg = "INSERT INTO users (username,password,email) VALUES (".mysqlesc($username).",".mysqlesc($password_hash).",".mysqlesc($email).")";
 if ($query_run_reg = mysql_query($query_reg)) {
-echo 'Sikeres regisztráció';
 header('Location: register.php?success');
 exit();
-} else {
-echo '<hr><div class="error">Hiba történt a regisztráció közben! Kérjük, próbáld meg újra pár perc múlva.</div>';
-}
-} else {
-print '<div class="error">Hibás e-mail cím!</div>';
 }
 }
 }
-} else {
-echo '<hr><div class="error">Minden mezõ kitöltése kötelezõ!</div>';
-}
-}
-?>
+if (isset($_GET['user'])) {
+echo '
 <form action="register.php?user" method="POST">
 
 <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
@@ -115,29 +106,28 @@ echo '<hr><div class="error">Minden mezõ kitöltése kötelezõ!</div>';
 <li>A regisztráció során csak az alapadatok megadása kötelezõ. Bejelentkezés után a profilodban több dolgot is megadhatsz.</li>
 <li><strong>A regisztrációval automatikusan elfogadod a szabályzatunkat.</strong></li>
 </ul>
-Felhasználónév:<br><input type="text" name="username" value="<?php echo $username; ?>"><br><br>
-Jelszó:<br><input type="password" name="password"><br><br>
-Jelszó újra:<br><input type="password" name="password_again"><br><br>
-E-mail:<br><input type="text" name="email"value="<?php echo $email; ?>"><br><br>
-<input type="submit" name="register" value="Regisztráció">
-</form>
-<?php
-} else if (loggedin()) {
-echo 'Te már regisztráltál, és beléptél.';
+Felhasználónév:<br><input type="text" name="username" /><br><br>
+Jelszó:<br><input type="password" name="password" /><br><br>
+Jelszó újra:<br><input type="password" name="password_again" /><br><br>
+E-mail:<br><input type="text" name="email" /><br><br>
+<input type="submit" name="register" value="Regisztráció" />
+</form>';
 }
-} else if (isset(htmlsafechars($_GET['success']))) {
-print '<div class="success"><strong>Gratulálunk,</strong> sikeresen regisztráltad magad oldalunkra!<br>
-Most már beléphetsz!</div>';
-} else if (isset(htmlsafechars($_GET['forgetpass']))) {
-?>
+if (isset($_GET['forgetpass'])) {
+echo '
+<div id="right_panel">
+<div class="news_right_panel_top">Jelszóemlékeztetõ</div>
+<div class="right_panel_content">
+';
+echo '
 <form action="register.php?forgetpass" method="POST">
 Amennyiben elfelejtetted a jelenlegi jelszavadat, itt kérhetsz újat. Csak add meg a regisztrációkor használt e-mail címet, és rendszerünk küld egy új jelszót!
 Az eddig használt jelszó el fog veszni.<p>
 <center>
 <input type="text" name="forgetpass"> <input type="submit" name="forgetpass" value="Küldés">
-</form>
-<?php
-if (isset($forgetpass)) {
+</form>';
+
+if ( (isset($_GET['forgetpass'])) AND ( $_SERVER['REQUEST_METHOD'] === 'POST' ) ) {
 $username = htmlsafechars($_POST['username']);
 $read = mysql_query("SELECT * FROM users WHERE username=".mysqlesc($username));
 $sor = mysql_num_rows($read);
@@ -151,17 +141,11 @@ print 'Jelszavad kiküldtük a címedre';
 print 'Nem sikerült.';
 }
 }
-} else {
-print 'Nem létezõ URL lekérés.';
 }
-?>
+echo '
 </div>
 <div class="right_panel_footer"></div>
-</div>
-<?php
-// Footer
-include 'includes/footer.php';
+</div>';
+
+foot();
 ?>
-</div>
-</body>
-</html>
